@@ -10,7 +10,6 @@ import com.couchbase.client.java.view.ViewRow;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class CompressLegacyDoc {
 
@@ -32,14 +31,10 @@ public class CompressLegacyDoc {
             for (ViewRow row : result) {
                 //for (N1qlQueryRow row : result2) {
 
-                // Create an id to use
-                UUID newID = UUID.randomUUID();
-
                 JsonDocument jsonDoc = myB.get(row.id());
-
                 LegacyDocument newDoc = LegacyDocument.create(jsonDoc.id(), jsonDoc.content());
+
                 myB2.upsert(newDoc);
-                System.out.println(newDoc.id());
 
                 // Build the array of items to load (TODO Batching)
                 //docArray.add(i, ldoc2);

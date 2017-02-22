@@ -1,6 +1,5 @@
 package com.couchbase;
 
-import com.couchbase.client.core.retry.FailFastRetryStrategy;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.document.Document;
@@ -23,13 +22,6 @@ public class ConnectionManager {
 
     public static Bucket getConnection() {
         CouchbaseEnvironment environment = DefaultCouchbaseEnvironment.builder()
-                .dnsSrvEnabled(false)
-                .kvEndpoints(2) //if you have batch upload can gain throughput
-                // but with small operations can cause contention with socket overhead
-                .computationPoolSize(4) // very rare needed to be changed
-                //.queryEndpoints(2) // long running N1QL queries
-                //.observeIntervalDelay()
-                .retryStrategy(FailFastRetryStrategy.INSTANCE) // only needed in demanding cache-only use case
                 .build();
         CouchbaseCluster cluster = CouchbaseCluster.create(environment, nodes);
 
@@ -43,18 +35,11 @@ public class ConnectionManager {
 
     public static Bucket getConnection2() {
         CouchbaseEnvironment environment = DefaultCouchbaseEnvironment.builder()
-                .dnsSrvEnabled(false)
-                .kvEndpoints(2) //if you have batch upload can gain throughput
-                // but with small operations can cause contention with socket overhead
-                .computationPoolSize(4) // very rare needed to be changed
-                //.queryEndpoints(2) // long running N1QL queries
-                //.observeIntervalDelay()
-                .retryStrategy(FailFastRetryStrategy.INSTANCE) // only needed in demanding cache-only use case
                 .build();
         CouchbaseCluster cluster = CouchbaseCluster.create(environment, nodes);
 
         List<Transcoder<? extends Document, ?>> transcoders = new ArrayList<>();
-        transcoders.add(new LegacyTranscoder(0));
+        transcoders.add(new LegacyTranscoder(500));
 
         final Bucket bucket = cluster.openBucket(bucketName2, "", transcoders);
 
